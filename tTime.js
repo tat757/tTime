@@ -1,11 +1,61 @@
 var tTime = {
-	add: function(id){
-			var setStyle = function(d){
-			d.style.height = '12px';
-			d.style.width = '14px';
-			d.style.padding = '0px';
-			d.style.border = 'none';
-			d.style.backgroundColor = '#f0efe7';
+	value:{
+		hour: 8,
+		minute: 0,
+		hour12: 8,
+		meridiem: 'AM',
+		formatTime: '8:00AM'
+	},
+	setValue : function(value, type){
+		var h, m, t;
+		if(type === 'h'){
+			this.value.hour12 = value;
+			if(this.value.meridiem == 'AM'){
+				if(value == 12){
+					this.value.hour = 0;
+				}
+				else{
+					this.value.hour = value;
+				}
+			}
+			else if(this.value.meridiem == 'PM'){
+				this.value.hour = this.value.hour12 + 12;
+				if(value == 12){
+					this.value.hour = 12;
+				}
+			}
+		}
+		else if(type === 'm'){
+			this.value.minute = +value;
+		}
+		else if(type === 't'){
+			if(value == 'AM'){
+				this.value.meridiem = 'AM';
+				this.value.hour = this.value.hour12;
+				if(this.value.hour12 == 12){
+					this.value.hour = 0;
+				}
+			}
+			else if(value == 'PM'){
+				this.value.meridiem = 'PM';
+				this.value.hour = this.value.hour12 + 12;
+				if(this.value.hour12 == 12){
+					this.value.hour = 12;
+				}
+			}
+		}
+		this.value.minute < 10 ? 
+			this.value.formatTime = this.value.hour12 + ':0' + this.value.minute + this.value.meridiem 
+			: this.value.formatTime = this.value.hour12 + ':' + this.value.minute + this.value.meridiem;
+	},
+	create: function(id){
+		var tTime = this;
+		var setStyle = function(d, styles){
+			if(d.style){
+				for(style in styles){
+					d.style[style] = styles[style];
+				}
+			}
 		}
 		var EventHandler = {
 			addHandler : function(element, type, handler){
@@ -27,85 +77,68 @@ var tTime = {
 			getTarget : function(e){
 				return e.target || e.srcElement;
 			},
-
-			keyup : function(id, type, callback){
-				EventHandler.addHandler(id, 'keyup', function(e){
-					e = EventHandler.getEvent(e);
-					var target = EventHandler.getTarget(e);
-
-					if(!isNaN(e.key)){
-						if(type === 'h'){
-							if(parseInt(target.value) > 12){
-								target.value = +e.key;
-							}
-						}
-						else if(type === 'm'){
-							if(parseInt(target.value) > 59){
-								target.value = +e.key;
-							}
-						}
-						callback(null);
-					}
-					callback(true);
-				});
-			},
-			keypress : function(id, type){
-				EventHandler.addHandler(id, 'keypress', function(e){
-					e = EventHandler.getEvent(e);
-					var target = EventHandler.getTarget(e);
-					console.log(e.key);
-					if(type === 'hm'){
-						if(!isNaN(e.key)){
-							if(target.value.split('').length > 1){
-								target.value = target.value.slice(0, 0);
-							}
-						}
-						else{
-							EventHandler.preventDefault(e);
-						}
-					}
-					else if(type === 't'){
-						console.log(e);
-						if(e.key === 'A' || e.key === 'a'){
-							target.value = 'AM';
-							if(target.parentNode.parentNode.value.hour >= 12){
-								target.parentNode.parentNode.value.hour -= 12;
-							}
-							EventHandler.preventDefault(e);
-						}
-						else if(e.key === 'P' || e.key === 'p'){
-							target.value = 'PM';
-							if(target.parentNode.parentNode.value.hour < 12){
-								target.parentNode.parentNode.value.hour += 12;
-							}
-							EventHandler.preventDefault(e);
-						}
-						else{
-							EventHandler.preventDefault(e);
-						}
-						
-					}
-				});
-			},
 			keydown: function(id, type){
 				EventHandler.addHandler(id, 'keydown', function(e){
 					e = EventHandler.getEvent(e);
 					var target = EventHandler.getTarget(e);
-					if(e.keyCode === 38 || e.keyCode === 40){
-						if(target.value === 'PM'){
+					var hour;
+					if(type === 't'){
+						if(e.keyCode === 38 || e.keyCode === 40){
+							if(target.value === 'PM'){
+								target.value = 'AM';
+								if(target.parentNode.parentNode.value.hour > 12){
+									target.parentNode.parentNode.value.hour -= 12;
+								}
+							}
+							else{
+								target.value = 'PM';
+								if(target.parentNode.parentNode.value.hour <= 12){
+									target.parentNode.parentNode.value.hour += 12;
+								}
+							}
+							hour = target.parentNode.parentNode.value.hour;
+						}
+						else if(e.key === 'a' || e.key === 'A'){
 							target.value = 'AM';
-							if(target.parentNode.parentNode.value.hour >= 12){
+							if(target.parentNode.parentNode.value.hour > 12){
 								target.parentNode.parentNode.value.hour -= 12;
 							}
 						}
-						else{
+						else if(e.key === 'p' || e.key === 'P'){
 							target.value = 'PM';
-							if(target.parentNode.parentNode.value.hour < 12){
+							if(target.parentNode.parentNode.value.hour <= 12){
 								target.parentNode.parentNode.value.hour += 12;
 							}
 						}
-						EventHandler.preventDefault(e);
+						tTime.setValue(target.value, 't');
 					}
+					else if(type === 'm'){
+						if(!isNaN(e.key)){
+							if(+target.value > 10 || +target.value > 5){
+								target.value = '0' + e.key;
+							}
+							else{
+								target.value = target.value.split('')[1] + e.key;
+							}
+							tTime.setValue(+target.value, 'm');
+						}
+					}
+					else if(type === 'h'){
+						if(!isNaN(e.key)){
+							if(e.key == 0){
+								target.value = '12';
+							}
+							else if(+target.value == 1 && +e.key < 3){
+								target.value = target.value.split('')[1] + e.key;
+							}
+							else{
+								target.value = '0' + e.key;
+							}
+							tTime.setValue(+target.value, 'h');
+						}
+						
+					}
+					EventHandler.preventDefault(e);
 				});
 			},
 			preventDefault: function(e){
@@ -119,33 +152,47 @@ var tTime = {
 		}
 		var p = document.getElementById(id);
 		var d = document.createElement('div');
-		console.log(d);
 		d.innerHTML = '<input type=\"text\">:<input type=\"text\"><input type=\"text\">';
 		p.appendChild(d);
-		console.log(d.childElementCount);
-		console.log(d.firstChild);
-		var style = {
+		var hmStyle = {
 			height: '12px',
+			lineHeight: '16px',
 			width: '14px',
 			padding: '0px',
 			border: 'none'
 		}
+		var tTimeStyle = {
+			height: '16px',
+			width: '60px',
+			paddingLeft: '7px',
+			paddingTop: '5px',
+			paddingBottom: '5px',
+			paddingRight: '7px',
+			backgroundColor: '#DDDDDD',
+		}
 		var h = d.firstChild;
 		var m = h.nextSibling.nextSibling;
 		var t = d.lastChild;
-		setStyle(h);
-		setStyle(m);
-		setStyle(t);
+		setStyle(h, hmStyle);
+		setStyle(m, hmStyle);
+		setStyle(t, hmStyle);
+		setStyle(d, tTimeStyle);
+		h.style.textAlign = 'right';
 		t.style.width = '22px';
 		t.value = 'AM';
-		p.value = {};
+		p.value = this.value;
+		h.value = this.value.hour;
+		this.value.minute < 10 ? m.value = '0' + this.value.minute : m.value = this.value.minute;
+		t.value = this.value.meridiem;
 
-		EventHandler.keyup(h, 'h', function(err, res){ p.value.hour = +h.value; console.log(h.value);});
-		EventHandler.keyup(m, 'm', function(err, res){ p.value.minute = +m.value; console.log(p.value);});
-		EventHandler.keypress(h, 'hm');
-		EventHandler.keypress(m, 'hm');
-		EventHandler.keypress(t, 't');
+		//EventHandler.keyup(h, 'h', function(err, res){ p.value.hour = +h.value; tTime.setValue(p.value.hour, 'h');});
+		//EventHandler.keyup(m, 'm', function(err, res){ p.value.minute = +m.value; tTime.setValue(p.value.minute, 'm');});
+		//EventHandler.keypress(h, 'hm');
+		//EventHandler.keypress(m, 'hm');
+		//EventHandler.keypress(t, 't');
 		EventHandler.keydown(t, 't');
+		EventHandler.keydown(m, 'm');
+		EventHandler.keydown(h, 'h');
 
 		return p.value;
 	}

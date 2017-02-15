@@ -10,10 +10,13 @@
 <script type="text/javascript">
 
 
-	var test2 = tTime.add('test');
-	setInterval(function(){console.log(test2);}, 3000);
-	
-	console.log(test2);
+	tTime.create('test');
+
+	console.log(document.body.style);
+	document.body.style.backgroundColor = '#85144b';
+	//check the value of the time picker
+	setInterval(function(){console.log(tTime.value);}, 3000);
+
 </script>
 </body>
 </html>
