@@ -1,0 +1,10 @@
+0.3.0
+-Added background color when focus on input areas
+-Fixed an error which allow user input space
+
+0.2.0
+-Added value object to help record the input values
+-Added default inputs
+-Improved style of time picker
+-Improved style of demo site
+-Improved input control

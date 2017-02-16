@@ -57,6 +57,9 @@ var tTime = {
 				}
 			}
 		}
+		var isNumber = function(value){
+			return typeof value === 'number' && isFinite(value);
+		}
 		var EventHandler = {
 			addHandler : function(element, type, handler){
 				if(element.addEventListener){
@@ -113,7 +116,7 @@ var tTime = {
 						tTime.setValue(target.value, 't');
 					}
 					else if(type === 'm'){
-						if(!isNaN(e.key)){
+						if(!isNaN(e.key) && e.keyCode !== 32){
 							if(+target.value > 10 || +target.value > 5){
 								target.value = '0' + e.key;
 							}
@@ -124,15 +127,15 @@ var tTime = {
 						}
 					}
 					else if(type === 'h'){
-						if(!isNaN(e.key)){
+						if(!isNaN(e.key) && e.keyCode !== 32){
 							if(e.key == 0){
 								target.value = '12';
 							}
 							else if(+target.value == 1 && +e.key < 3){
-								target.value = target.value.split('')[1] + e.key;
+								target.value = '1' + e.key;
 							}
 							else{
-								target.value = '0' + e.key;
+								target.value = e.key;
 							}
 							tTime.setValue(+target.value, 'h');
 						}
@@ -140,6 +143,33 @@ var tTime = {
 					}
 					EventHandler.preventDefault(e);
 				});
+			},
+			focus: function(id, type){
+				if(type === 'hmt'){
+					EventHandler.addHandler(id, 'focus', function(e){
+						e= EventHandler.getEvent(e);
+						var target = EventHandler.getTarget(e);
+						var style = {
+							outlineColor : '#d7daed',
+							backgroundColor : '#d7daed',
+							crusor: 'pointer'
+						}
+						setStyle(id, style); 
+					});
+				}
+			},
+			blur: function(id, type){
+				if(type === 'hmt'){
+					EventHandler.addHandler(id, 'blur', function(e){
+						e= EventHandler.getEvent(e);
+						var target = EventHandler.getTarget(e);
+						var style = {
+							border : '0px',
+							backgroundColor : 'white'
+						}
+						setStyle(id, style); 
+					});
+				}
 			},
 			preventDefault: function(e){
 				if(e.preventDefault){
@@ -155,11 +185,12 @@ var tTime = {
 		d.innerHTML = '<input type=\"text\">:<input type=\"text\"><input type=\"text\">';
 		p.appendChild(d);
 		var hmStyle = {
-			height: '12px',
+			height: '16px',
 			lineHeight: '16px',
 			width: '14px',
 			padding: '0px',
-			border: 'none'
+			border: 'none',
+			font: '12px'
 		}
 		var tTimeStyle = {
 			height: '16px',
@@ -185,14 +216,17 @@ var tTime = {
 		this.value.minute < 10 ? m.value = '0' + this.value.minute : m.value = this.value.minute;
 		t.value = this.value.meridiem;
 
-		//EventHandler.keyup(h, 'h', function(err, res){ p.value.hour = +h.value; tTime.setValue(p.value.hour, 'h');});
-		//EventHandler.keyup(m, 'm', function(err, res){ p.value.minute = +m.value; tTime.setValue(p.value.minute, 'm');});
-		//EventHandler.keypress(h, 'hm');
-		//EventHandler.keypress(m, 'hm');
-		//EventHandler.keypress(t, 't');
 		EventHandler.keydown(t, 't');
 		EventHandler.keydown(m, 'm');
 		EventHandler.keydown(h, 'h');
+
+		EventHandler.focus(h, 'hmt');
+		EventHandler.focus(m, 'hmt');
+		EventHandler.focus(t, 'hmt');
+
+		EventHandler.blur(h, 'hmt');
+		EventHandler.blur(m, 'hmt');
+		EventHandler.blur(t, 'hmt');
 
 		return p.value;
 	}
