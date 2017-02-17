@@ -48,138 +48,141 @@ var tTime = {
 			this.value.formatTime = this.value.hour12 + ':0' + this.value.minute + this.value.meridiem 
 			: this.value.formatTime = this.value.hour12 + ':' + this.value.minute + this.value.meridiem;
 	},
-	create: function(id){
-		var tTime = this;
-		var setStyle = function(d, styles){
-			if(d.style){
-				for(style in styles){
-					d.style[style] = styles[style];
-				}
+	setStyle : function(id, styles){
+		if(id.style){
+			for(style in styles){
+				id.style[style] = styles[style];
 			}
 		}
-		var isNumber = function(value){
-			return typeof value === 'number' && isFinite(value);
-		}
-		var EventHandler = {
-			addHandler : function(element, type, handler){
-				if(element.addEventListener){
-					element.addEventListener(type, handler, false);
-				}
-				else if(element.attachEvent){
-					element.attachEvent('on' + type, handler);
-				}
-				else{
-					element['on' + type] = handler;
-				}
-			},
+	},
+	isNumber : function(value){
+		return typeof value === 'number' && isFinite(value);
+	},
+	EventHandler : {
+		addHandler : function(element, type, handler){
+			if(element.addEventListener){
+				element.addEventListener(type, handler, false);
+			}
+			else if(element.attachEvent){
+				element.attachEvent('on' + type, handler);
+			}
+			else{
+				element['on' + type] = handler;
+			}
+		},
 
-			getEvent : function(e){
-				return e ? e : window.event;
-			},
+		getEvent : function(e){
+			return e ? e : window.event;
+		},
 
-			getTarget : function(e){
-				return e.target || e.srcElement;
-			},
-			keydown: function(id, type){
-				EventHandler.addHandler(id, 'keydown', function(e){
-					e = EventHandler.getEvent(e);
-					var target = EventHandler.getTarget(e);
-					var hour;
-					if(type === 't'){
-						if(e.keyCode === 38 || e.keyCode === 40){
-							if(target.value === 'PM'){
-								target.value = 'AM';
-								if(target.parentNode.parentNode.value.hour > 12){
-									target.parentNode.parentNode.value.hour -= 12;
-								}
-							}
-							else{
-								target.value = 'PM';
-								if(target.parentNode.parentNode.value.hour <= 12){
-									target.parentNode.parentNode.value.hour += 12;
-								}
-							}
-							hour = target.parentNode.parentNode.value.hour;
-						}
-						else if(e.key === 'a' || e.key === 'A'){
+		getTarget : function(e){
+			return e.target || e.srcElement;
+		},
+		keydown: function(id, type){
+			var EventHandler = this;
+			EventHandler.addHandler(id, 'keydown', function(e){
+				e = EventHandler.getEvent(e);
+				var target = EventHandler.getTarget(e);
+				var hour;
+				if(type === 't'){
+					if(e.keyCode === 38 || e.keyCode === 40){
+						if(target.value === 'PM'){
 							target.value = 'AM';
 							if(target.parentNode.parentNode.value.hour > 12){
 								target.parentNode.parentNode.value.hour -= 12;
 							}
 						}
-						else if(e.key === 'p' || e.key === 'P'){
+						else{
 							target.value = 'PM';
 							if(target.parentNode.parentNode.value.hour <= 12){
 								target.parentNode.parentNode.value.hour += 12;
 							}
 						}
-						tTime.setValue(target.value, 't');
+						hour = target.parentNode.parentNode.value.hour;
 					}
-					else if(type === 'm'){
-						if(!isNaN(e.key) && e.keyCode !== 32){
-							if(+target.value > 10 || +target.value > 5){
-								target.value = '0' + e.key;
-							}
-							else{
-								target.value = target.value.split('')[1] + e.key;
-							}
-							tTime.setValue(+target.value, 'm');
+					else if(e.key === 'a' || e.key === 'A'){
+						target.value = 'AM';
+						if(target.parentNode.parentNode.value.hour > 12){
+							target.parentNode.parentNode.value.hour -= 12;
 						}
 					}
-					else if(type === 'h'){
-						if(!isNaN(e.key) && e.keyCode !== 32){
-							if(e.key == 0){
-								target.value = '12';
-							}
-							else if(+target.value == 1 && +e.key < 3){
-								target.value = '1' + e.key;
-							}
-							else{
-								target.value = e.key;
-							}
-							tTime.setValue(+target.value, 'h');
+					else if(e.key === 'p' || e.key === 'P'){
+						target.value = 'PM';
+						if(target.parentNode.parentNode.value.hour <= 12){
+							target.parentNode.parentNode.value.hour += 12;
 						}
-						
 					}
-					EventHandler.preventDefault(e);
+					tTime.setValue(target.value, 't');
+				}
+				else if(type === 'm'){
+					if(!isNaN(e.key) && e.keyCode !== 32){
+						if(+target.value > 10 || +target.value > 5){
+							target.value = '0' + e.key;
+						}
+						else{
+							target.value = target.value.split('')[1] + e.key;
+						}
+						tTime.setValue(+target.value, 'm');
+					}
+				}
+				else if(type === 'h'){
+					if(!isNaN(e.key) && e.keyCode !== 32){
+						if(e.key == 0){
+							target.value = '12';
+						}
+						else if(+target.value == 1 && +e.key < 3){
+							target.value = '1' + e.key;
+						}
+						else{
+							target.value = e.key;
+						}
+						tTime.setValue(+target.value, 'h');
+					}
+					
+				}
+				EventHandler.preventDefault(e);
+			});
+		},
+		focus: function(id, type){
+			var EventHandler = this;
+			if(type === 'hmt'){
+				EventHandler.addHandler(id, 'focus', function(e){
+					e= EventHandler.getEvent(e);
+					var target = EventHandler.getTarget(e);
+					var style = {
+						outlineColor : '#d7daed',
+						backgroundColor : '#d7daed',
+						crusor: 'pointer'
+					}
+					tTime.setStyle(id, style); 
 				});
-			},
-			focus: function(id, type){
-				if(type === 'hmt'){
-					EventHandler.addHandler(id, 'focus', function(e){
-						e= EventHandler.getEvent(e);
-						var target = EventHandler.getTarget(e);
-						var style = {
-							outlineColor : '#d7daed',
-							backgroundColor : '#d7daed',
-							crusor: 'pointer'
-						}
-						setStyle(id, style); 
-					});
-				}
-			},
-			blur: function(id, type){
-				if(type === 'hmt'){
-					EventHandler.addHandler(id, 'blur', function(e){
-						e= EventHandler.getEvent(e);
-						var target = EventHandler.getTarget(e);
-						var style = {
-							border : '0px',
-							backgroundColor : 'white'
-						}
-						setStyle(id, style); 
-					});
-				}
-			},
-			preventDefault: function(e){
-				if(e.preventDefault){
-					e.preventDefault();
-				}
-				else{
-					e.returnValue = false;
-				}
+			}
+		},
+		blur: function(id, type){
+			var EventHandler = this;
+			if(type === 'hmt'){
+				EventHandler.addHandler(id, 'blur', function(e){
+					e= EventHandler.getEvent(e);
+					var target = EventHandler.getTarget(e);
+					var style = {
+						border : '0px',
+						backgroundColor : 'white'
+					}
+					tTime.setStyle(id, style); 
+				});
+			}
+		},
+		preventDefault: function(e){
+			if(e.preventDefault){
+				e.preventDefault();
+			}
+			else{
+				e.returnValue = false;
 			}
 		}
+	},
+	createTime: function(id){
+		var tTime = this;
 		var p = document.getElementById(id);
 		var d = document.createElement('div');
 		d.innerHTML = '<input type=\"text\">:<input type=\"text\"><input type=\"text\">';
@@ -192,7 +195,7 @@ var tTime = {
 			border: 'none',
 			font: '12px'
 		}
-		var tTimeStyle = {
+		var timeStyle = {
 			height: '16px',
 			width: '60px',
 			paddingLeft: '7px',
@@ -204,31 +207,44 @@ var tTime = {
 		var h = d.firstChild;
 		var m = h.nextSibling.nextSibling;
 		var t = d.lastChild;
-		setStyle(h, hmStyle);
-		setStyle(m, hmStyle);
-		setStyle(t, hmStyle);
-		setStyle(d, tTimeStyle);
+		tTime.setStyle(h, hmStyle);
+		tTime.setStyle(m, hmStyle);
+		tTime.setStyle(t, hmStyle);
+		tTime.setStyle(d, timeStyle);
 		h.style.textAlign = 'right';
 		t.style.width = '22px';
 		t.value = 'AM';
-		p.value = this.value;
-		h.value = this.value.hour;
-		this.value.minute < 10 ? m.value = '0' + this.value.minute : m.value = this.value.minute;
-		t.value = this.value.meridiem;
+		p.value = tTime.value;
+		h.value = tTime.value.hour;
+		tTime.value.minute < 10 ? m.value = '0' + tTime.value.minute : m.value = tTime.value.minute;
+		t.value = tTime.value.meridiem;
 
-		EventHandler.keydown(t, 't');
-		EventHandler.keydown(m, 'm');
-		EventHandler.keydown(h, 'h');
+		tTime.EventHandler.keydown(t, 't');
+		tTime.EventHandler.keydown(m, 'm');
+		tTime.EventHandler.keydown(h, 'h');
 
-		EventHandler.focus(h, 'hmt');
-		EventHandler.focus(m, 'hmt');
-		EventHandler.focus(t, 'hmt');
+		tTime.EventHandler.focus(h, 'hmt');
+		tTime.EventHandler.focus(m, 'hmt');
+		tTime.EventHandler.focus(t, 'hmt');
 
-		EventHandler.blur(h, 'hmt');
-		EventHandler.blur(m, 'hmt');
-		EventHandler.blur(t, 'hmt');
+		tTime.EventHandler.blur(h, 'hmt');
+		tTime.EventHandler.blur(m, 'hmt');
+		tTime.EventHandler.blur(t, 'hmt');
 
 		return p.value;
+	},
+	createDate: function(id){
+		var tTime = this;
+		var p = document.getElementById(id);
+		var d = document.createElement('div');
+		p.appendChild(d);
+		d.innerHTML = '<input type=\"text\"></input>/<input type=\"text\"></input>/<input type=\"text\"></input>';
+		var month = d.firstChild;
+		var day = month.nextSibling.nextSibling;
+		var year = d.lastChild;
+		var currTime = new Date();
+		day.value = currTime.getDate();
+		month.value = currTime.getMonth() + 1;
+		year.value = currTime.getFullYear();
 	}
-
 };
