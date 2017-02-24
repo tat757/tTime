@@ -1,3 +1,7 @@
+0.5.0
+-Added Date pick feature
+-Improved object structure
+
 0.4.0
 -Added the inputs of Date part
 -Modified the structure of the object

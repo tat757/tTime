@@ -1,52 +1,95 @@
 var tTime = {
 	value:{
-		hour: 8,
-		minute: 0,
-		hour12: 8,
-		meridiem: 'AM',
-		formatTime: '8:00AM'
+		time : {
+			hour: 8,
+			minute: 0,
+			hour12: 8,
+			meridiem: 'AM',
+			formatTime: '8:00AM'
+		},
+		date : {
+			month: 0,
+			day: 1,
+			year: 2017,
+			formatDate: '1/01/2017',
+			tableMonth: 0,
+			tableYear: 2017
+		}
+	},
+	dropTheadStyle : {
+		height: '16px',
+		width: '232px',
+		backgroundColor: '#00ffbf',
+		borderBottomWidth: '1px',
+		borderBottomStyle: 'solid',
+		borderBottomColor: '#85144b',
+		paddingBottom: '1px',
+		paddingLeft: '0px',
+		paddingRight: '0px',
+		display: 'block',
+		float: 'left'
+	},
+	dropTheadCellStyle : {
+		fontSize: '12px', 
+		width: '33px', 
+		textAlign: 'center', 
+		cursor: 'default',
+		display: 'inline-block'
 	},
 	setValue : function(value, type){
-		var h, m, t;
+		var tTime = this;
 		if(type === 'h'){
-			this.value.hour12 = value;
-			if(this.value.meridiem == 'AM'){
+			tTime.value.time.hour12 = value;
+			if(tTime.value.time.meridiem == 'AM'){
 				if(value == 12){
-					this.value.hour = 0;
+					tTime.value.time.hour = 0;
 				}
 				else{
-					this.value.hour = value;
+					tTime.value.time.hour = value;
 				}
 			}
-			else if(this.value.meridiem == 'PM'){
-				this.value.hour = this.value.hour12 + 12;
+			else if(tTime.value.time.meridiem == 'PM'){
+				tTime.value.time.hour = tTime.value.time.hour12 + 12;
 				if(value == 12){
-					this.value.hour = 12;
+					tTime.value.time.hour = 12;
 				}
 			}
 		}
 		else if(type === 'm'){
-			this.value.minute = +value;
+			tTime.value.time.minute = +value;
 		}
 		else if(type === 't'){
 			if(value == 'AM'){
-				this.value.meridiem = 'AM';
-				this.value.hour = this.value.hour12;
-				if(this.value.hour12 == 12){
-					this.value.hour = 0;
+				tTime.value.time.meridiem = 'AM';
+				tTime.value.time.hour = tTime.value.time.hour12;
+				if(tTime.value.time.hour12 == 12){
+					tTime.value.time.hour = 0;
 				}
 			}
 			else if(value == 'PM'){
-				this.value.meridiem = 'PM';
-				this.value.hour = this.value.hour12 + 12;
-				if(this.value.hour12 == 12){
-					this.value.hour = 12;
+				tTime.value.time.meridiem = 'PM';
+				tTime.value.time.hour = tTime.value.time.hour12 + 12;
+				if(tTime.value.time.hour12 == 12){
+					tTime.value.time.hour = 12;
 				}
 			}
 		}
-		this.value.minute < 10 ? 
-			this.value.formatTime = this.value.hour12 + ':0' + this.value.minute + this.value.meridiem 
-			: this.value.formatTime = this.value.hour12 + ':' + this.value.minute + this.value.meridiem;
+		else if(type === 'date'){
+			var date = new Date(value);
+			tTime.value.date.month = date.getMonth() + 1;
+			tTime.value.date.day = date.getDate();
+			tTime.value.date.year = date.getFullYear();
+			tTime.value.date.formatDate = tTime.value.date.month + '\/' + tTime.value.date.day + '\/' + tTime.value.date.year;
+		}
+		tTime.value.time.minute < 10 ? 
+			tTime.value.time.formatTime = tTime.value.time.hour12 + ':0' + tTime.value.time.minute + tTime.value.time.meridiem 
+			: tTime.value.time.formatTime = tTime.value.time.hour12 + ':' + tTime.value.time.minute + tTime.value.time.meridiem;
+	},
+	setDate : function(id, value){
+		var date = new Date(value);
+		id.firstChild.value = date.getMonth() + 1;
+		date.getDate() < 10 ? id.firstChild.nextSibling.nextSibling.value = '0' + date.getDate() : id.firstChild.nextSibling.nextSibling.value = date.getDate();
+		id.lastChild.value = date.getFullYear();
 	},
 	setStyle : function(id, styles){
 		if(id.style){
@@ -145,22 +188,31 @@ var tTime = {
 		},
 		focus: function(id, type){
 			var EventHandler = this;
-			if(type === 'hmt'){
+			if(type === 'time'){
 				EventHandler.addHandler(id, 'focus', function(e){
 					e= EventHandler.getEvent(e);
 					var target = EventHandler.getTarget(e);
 					var style = {
 						outlineColor : '#d7daed',
 						backgroundColor : '#d7daed',
-						crusor: 'pointer'
+						cursor: 'pointer'
 					}
 					tTime.setStyle(id, style); 
 				});
 			}
+			else if(type === 'date'){
+				EventHandler.addHandler(id, 'focus', function(e){
+					e= EventHandler.getEvent(e);
+					var target = EventHandler.getTarget(e);
+
+					tTime.setStyle(target.parentNode.nextSibling, {display: 'block'}); 
+				});
+
+			}
 		},
 		blur: function(id, type){
 			var EventHandler = this;
-			if(type === 'hmt'){
+			if(type === 'time'){
 				EventHandler.addHandler(id, 'blur', function(e){
 					e= EventHandler.getEvent(e);
 					var target = EventHandler.getTarget(e);
@@ -169,6 +221,108 @@ var tTime = {
 						backgroundColor : 'white'
 					}
 					tTime.setStyle(id, style); 
+				});
+			}
+		},
+		mouseover: function(id, type){
+			var EventHandler = this;
+			if(type === 'dateCell'){
+				EventHandler.addHandler(id, 'mouseover', function(e){
+					e = EventHandler.getEvent(e);
+					var target = EventHandler.getTarget(e);
+					if(id.style.backgroundColor !== 'rgb(0, 128, 255)' && id.style.backgroundColor !== '#0080ff'){
+						console.log(tTime);
+						tTime.setStyle(id, {backgroundColor: '#00bfff'});
+					}
+				});
+			}
+		},
+		mouseout: function(id, type){
+			var EventHandler = this;
+			if(type === 'dateCell'){
+				EventHandler.addHandler(id, 'mouseout', function(e){
+					e = EventHandler.getEvent(e);
+					var target = EventHandler.getTarget(e);
+					console.log(id.style.backgroundColor);
+					if(id.style.backgroundColor !== 'rgb(0, 128, 255)' && id.style.backgroundColor !== '#0080ff'){
+						tTime.setStyle(id, {backgroundColor: 'white'});
+					}
+				});
+			}
+		},
+		click: function(id, type){
+			var EventHandler = this;
+			if(type === 'window'){
+				EventHandler.addHandler(id, 'click', function(e){
+					e = EventHandler.getEvent(e);
+					var target = EventHandler.getTarget(e);
+					if(target.className !== 'tTimeDateInput'){
+						console.log(target);
+						if(target.className == 'tTimeDateCell'){
+							var oldSelected = document.querySelectorAll('[data-selected]');
+							for(selected in oldSelected){
+								if(oldSelected[selected].dataset && oldSelected[selected].dataset.selected){
+									oldSelected[selected].dataset.selected = false;
+									oldSelected[selected].style.backgroundColor = 'white';
+								}
+							}
+							target.style.backgroundColor = '#0080ff';
+							target.dataset.selected = true;
+							tTime.setValue(target.dataset.date, 'date');
+							target.parentNode.parentNode.parentNode.style.display = 'none';
+							tTime.setDate(target.parentNode.parentNode.parentNode.previousSibling, target.dataset.date);
+
+						}
+						else if(target.className !== 'tTimeDropTitleLeftButton' && target.className !== 'tTimeDropTitleRightButton'){
+							document.getElementsByClassName('tTimeDrop')[0].style.display = 'none';
+						}
+					}
+				});
+			}
+			else if(type === 'button'){
+				EventHandler.addHandler(id, 'click', function(e){
+					e = EventHandler.getEvent(e);
+					var target = EventHandler.getTarget(e);
+					if(target.className == 'tTimeDropTitleLeftButton'){
+						if(tTime.value.date.tableMonth == 0){
+							tTime.value.date.tableMonth = 11;
+							tTime.value.date.tableYear--;
+						}
+						else{
+							tTime.value.date.tableMonth--;
+						}
+						var title = target.parentNode;
+						var tbody = target.parentNode.parentNode.lastChild;
+						console.log(target.parentNode);
+						var tableTime = new Date();
+						tableTime.setMonth(tTime.value.date.tableMonth);
+						tableTime.setYear(tTime.value.date.tableYear);
+						tableTime.setDate(1);
+						tbody.innerHTML = '';
+						tTime.createDropTbody(tableTime, tbody);
+						title.innerHTML = '';
+						tTime.createDropTitle(tableTime, title);
+					}
+					else if(target.className == 'tTimeDropTitleRightButton'){
+						if(tTime.value.date.tableMonth == 11){
+							tTime.value.date.tableMonth = 1;
+							tTime.value.date.tableYear++;
+						}
+						else{
+							tTime.value.date.tableMonth++;
+						}
+						var title = target.parentNode;
+						var tbody = target.parentNode.parentNode.lastChild;
+						console.log(target.parentNode);
+						var tableTime = new Date();
+						tableTime.setMonth(tTime.value.date.tableMonth);
+						tableTime.setYear(tTime.value.date.tableYear);
+						tableTime.setDate(1);
+						tbody.innerHTML = '';
+						tTime.createDropTbody(tableTime, tbody);
+						title.innerHTML = '';
+						tTime.createDropTitle(tableTime, title);
+					}
 				});
 			}
 		},
@@ -193,7 +347,8 @@ var tTime = {
 			width: '14px',
 			padding: '0px',
 			border: 'none',
-			font: '12px'
+			font: '12px',
+			cursor: 'pointer'
 		}
 		var timeStyle = {
 			height: '16px',
@@ -203,6 +358,8 @@ var tTime = {
 			paddingBottom: '5px',
 			paddingRight: '7px',
 			backgroundColor: '#DDDDDD',
+			float : 'left',
+			cursor: 'pointer'
 		}
 		var h = d.firstChild;
 		var m = h.nextSibling.nextSibling;
@@ -214,37 +371,252 @@ var tTime = {
 		h.style.textAlign = 'right';
 		t.style.width = '22px';
 		t.value = 'AM';
-		p.value = tTime.value;
-		h.value = tTime.value.hour;
-		tTime.value.minute < 10 ? m.value = '0' + tTime.value.minute : m.value = tTime.value.minute;
-		t.value = tTime.value.meridiem;
+		p.value = tTime.value.time;
+		h.value = tTime.value.time.hour;
+		tTime.value.time.minute < 10 ? m.value = '0' + tTime.value.time.minute : m.value = tTime.value.time.minute;
+		t.value = tTime.value.time.meridiem;
 
 		tTime.EventHandler.keydown(t, 't');
 		tTime.EventHandler.keydown(m, 'm');
 		tTime.EventHandler.keydown(h, 'h');
 
-		tTime.EventHandler.focus(h, 'hmt');
-		tTime.EventHandler.focus(m, 'hmt');
-		tTime.EventHandler.focus(t, 'hmt');
+		tTime.EventHandler.focus(h, 'time');
+		tTime.EventHandler.focus(m, 'time');
+		tTime.EventHandler.focus(t, 'time');
 
-		tTime.EventHandler.blur(h, 'hmt');
-		tTime.EventHandler.blur(m, 'hmt');
-		tTime.EventHandler.blur(t, 'hmt');
+		tTime.EventHandler.blur(h, 'time');
+		tTime.EventHandler.blur(m, 'time');
+		tTime.EventHandler.blur(t, 'time');
 
 		return p.value;
+	},
+	createDropTbody : function(tableTime, dropTbody){
+		var tTime = this;
+		var start = false;
+		var done = false;
+		var i, j, cell, row;
+		var dayCount = 1;
+		tableTime.setDate(1);
+		for(i = 0; i < 6; i++){
+			row = document.createElement('tr');
+			for(j = 0; j < 7; j++){
+				cell = document.createElement('td');
+				if(start){
+					cell.innerHTML = dayCount;
+					cell.dataset.date = (tableTime.getMonth() + 1) + '\/' + dayCount + '\/' + tableTime.getFullYear();
+					dayCount++;
+				}
+				else{
+					if(j === tableTime.getDay()){
+						start = true;
+						cell.innerHTML = dayCount;
+						cell.dataset.date = (tableTime.getMonth() + 1) + '\/' + dayCount + '\/' + tableTime.getFullYear();
+						dayCount++;
+					}
+				}
+				if(start){
+					tTime.EventHandler.mouseover(cell, 'dateCell');
+					tTime.EventHandler.mouseout(cell, 'dateCell');
+				}
+				tTime.setStyle(cell, tTime.dropTheadCellStyle);
+				cell.className = 'tTimeDateCell';
+				cell.style.height = '22px';
+				cell.style.cursor = 'pointer';
+				cell.style.paddingTop = '0px';
+				cell.style.verticalAlign = 'middle';
+				cell.style.lineHeight = '22px';
+				if(tTime.value.date.tableMonth == tTime.value.date.month - 1 && tTime.value.date.tableYear == tTime.value.date.year && dayCount == tTime.value.date.day + 1){
+					cell.style.backgroundColor = '#0080ff';
+					cell.dataset.selected = true;
+				}
+				row.appendChild(cell);
+				switch(tableTime.getMonth()){
+					case 0:
+					case 2:
+					case 4:
+					case 6:
+					case 7:
+					case 9:
+					case 11:
+						if(dayCount > 31){
+							done = true;
+						}
+						break;
+					case 3:
+					case 5:
+					case 8:
+					case 10:
+						if(dayCount > 30){
+							done = true;
+						}
+						break;
+					case 1:
+						if(tableTime.getFullYear()%4 === 0){
+							if(dayCount > 29){
+								done = true;
+							}
+						}
+						else{
+							if(dayCount > 28){
+								done = true;
+							}
+						}
+						break;
+				}
+				if(done){
+					break;
+				}
+			}
+			dropTbody.appendChild(row);
+			row = null;
+			if(done){
+				break;
+			}
+		}	
+	},
+	createDropTitle : function(tableTime, dropTitle){
+		var tTime = this;
+		var month;
+		var year = tableTime.getFullYear();
+		var text = document.createElement('p');
+		var leftButton = document.createElement('button');
+		var rightButton = document.createElement('button');
+		var leftArrow = document.createElement('p');
+		var rightArrow = document.createElement('p');
+		var monthList = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		month = monthList[tableTime.getMonth()];
+		text.style.margin = '0px';
+		text.style.fontWeight = 'bold';
+		text.style.fontSize = '16px';
+		text.style.lineHeight = '32px';
+		text.style.verticalAlign = 'center';
+		text.style.textAlign = 'center';
+		text.style.cursor = 'default';
+		text.style.width = '160px';
+		text.style.float = 'left';
+		text.innerHTML = month + ' ' + year;
+		leftButton.innerHTML = '<';
+		leftButton.className = 'tTimeDropTitleLeftButton';
+		rightButton.className = 'tTimeDropTitleRightButton';
+		rightButton.innerHTML = '>';
+		var dropTitleButtonStyle = {
+			width : '36px',
+			height : '32px',
+			float : 'left',
+			cursor : 'pointer'
+		}
+		tTime.setStyle(leftButton, dropTitleButtonStyle);
+		tTime.setStyle(rightButton, dropTitleButtonStyle);
+		tTime.EventHandler.click(leftButton, 'button');
+		tTime.EventHandler.click(rightButton, 'button');
+		dropTitle.appendChild(leftButton);
+		dropTitle.appendChild(text);
+		dropTitle.appendChild(rightButton);
 	},
 	createDate: function(id){
 		var tTime = this;
 		var p = document.getElementById(id);
 		var d = document.createElement('div');
+		var drop = document.createElement('div');
+		var dropTitle = document.createElement('div');
+		var dropThead = document.createElement('div');
+		var dropTbody = document.createElement('div');
 		p.appendChild(d);
 		d.innerHTML = '<input type=\"text\"></input>/<input type=\"text\"></input>/<input type=\"text\"></input>';
+		drop.className = 'tTimeDrop';
+		p.appendChild(drop);
+		
 		var month = d.firstChild;
 		var day = month.nextSibling.nextSibling;
-		var year = d.lastChild;
+		var year = day.nextSibling.nextSibling;
+		month.className = day.className = year.className = 'tTimeDateInput';
 		var currTime = new Date();
+		tTime.EventHandler.focus(month, 'date');
+		tTime.EventHandler.focus(day, 'date');
+		tTime.EventHandler.focus(year, 'date');
+		tTime.EventHandler.click(window, 'window');
+		//set style
+		var mdStyle = {
+			height : '16px',
+			width : '14px',
+			padding : '0px',
+			border : 'none',
+			font : '12px',
+			textAlign : 'right',
+			cursor: 'pointer'
+		};
+		var yStyle = {
+			height : '16px',
+			width : '28px',
+			padding : '0px',
+			border : 'none',
+			font : '12px',
+			cursor: 'pointer'
+		};
+		var dStyle = {
+			height: '16px',
+			width: '70px',
+			paddingLeft: '7px',
+			paddingTop: '5px',
+			paddingBottom: '5px',
+			paddingRight: '7px',
+			backgroundColor: '#DDDDDD',
+			position: 'relative',
+			float : 'left'
+		};
+		var dropStype = {
+			fontFamily: 'Arial, Helvetica, sans-serif',
+			marginTop: '28px',
+			height: '181px',
+			width: '232px',
+			position: 'absolute',
+			backgroundColor: 'White',
+			display: 'block',
+			zIndex: '1'
+		};
+		var dropTitleStyle = {
+			height: '32px',
+			backgroundColor: 'red'
+		};
+		var dropTbodyStyle = {
+			float: 'left'
+		}
+		tTime.setStyle(month, mdStyle);
+		tTime.setStyle(day, mdStyle);
+		tTime.setStyle(year, yStyle);
+		tTime.setStyle(d, dStyle);
+		tTime.setStyle(drop, dropStype);
+		tTime.setStyle(dropTitle, dropTitleStyle);
+		tTime.setStyle(dropThead, tTime.dropTheadStyle);
+		tTime.setStyle(dropTbody, dropTbodyStyle);
+		//initialize value to user's current time
 		day.value = currTime.getDate();
 		month.value = currTime.getMonth() + 1;
 		year.value = currTime.getFullYear();
+		tTime.setValue(currTime, 'date');
+		tTime.value.date.tableMonth = month.value - 1;
+		tTime.value.date.tableYear = year.value;
+		p.value = tTime.value.date;
+
+		//set drop
+		drop.appendChild(dropTitle);
+		drop.appendChild(dropThead);
+		drop.appendChild(dropTbody);
+		var weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+		var i, j, k;
+		var cell, cellText, row, dayCount, wd;
+		var tableTime = currTime;
+		for(i = 0; i < 7; i++){
+			cell = document.createElement('li');
+			cell.innerHTML = weekday[i];
+			tTime.setStyle(cell, tTime.dropTheadCellStyle);
+			dropThead.appendChild(cell);
+			cell = null;
+			cellText = null;
+		}
+		dayCount = 1;
+		
+		tTime.createDropTitle(tableTime, dropTitle);
+		tTime.createDropTbody(tableTime, dropTbody);
 	}
 };
