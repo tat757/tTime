@@ -3,19 +3,69 @@
 <head>
 	<title>test</title>
 	<script src="./tTime.js"></script>
+
+	<!-- Place this tag in your head or just before your close body tag. -->
+	<script async defer src="https://buttons.github.io/buttons.js"></script>
 </head>
 <body>
+<div style="position: relative; height: 30px;">
+	<h2 style="float: left;">tTime time picker</h2>	
+	<div style="float:left; padding: 20px;">
+		<!-- Place this tag where you want the button to render. -->
+		<a class="github-button" href="https://github.com/tat757/tTime" data-icon="octicon-star" data-style="mega" data-count-href="/tat757/tTime/stargazers" data-count-api="/repos/tat757/tTime#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star tat757/tTime on GitHub">Star</a>
+	</div>
+</div>
+<br>
+<h6>A javascript library to help devleopers build an easy-to-dev and easy-to-use time picker to their application</h6>
+<hr>
+<div style="clear: both;">
+	<div id="testDate"></div><h6>(id:testDate)</h6>
+</div>
+<h6>Create the date picker by using: tTime.createDate('testDate');</h6>
+<div id="dateValue"></div>
+<br>
+<hr>
 
-<div id="testDate"></div>
-<div id="test"></div>
+<div style="clear: both;">
+	<div id="testTime"></div><h6>(id:testTime)</h6>
+</div>
+<h6>Create the time picker by using: tTime.createDate('testTime');</h6>
+<div id="timeValue"></div>
 <script type="text/javascript">
 
 	tTime.createDate('testDate');
-	tTime.createTime('test');
+	tTime.createTime('testTime');
 	console.log(document.body.style);
-	document.body.style.backgroundColor = '#85144b';
+	document.body.style.backgroundColor = '#900C3F';
+	document.body.style.fontFamily = 'Arial, Helvetica, sans-serif';
 	//check the value of the time picker
-	setInterval(function(){console.log(document.getElementById('testDate').value);}, 3000);
+	var createValue = function(){
+		var date = document.getElementById('dateValue');
+		var time = document.getElementById('timeValue');
+		date.innerHTML = '';
+		time.innerHTML = '';
+
+		date.innerHTML = '<h4>testDate.value.month = ' + testDate.value.month + '</h4>' +
+						'<h4>testDate.value.day = ' + testDate.value.day + '</h4>' +
+						'<h4>testDate.value.year = ' + testDate.value.year + '</h4>' +
+						'<h4>testDate.value.formatDate = ' + testDate.value.formatDate + '</h4>' +
+						'<h4>testDate.value.tableMonth = ' + testDate.value.tableMonth + '</h4>' +
+						'<h4>testDate.value.tableYear = ' + testDate.value.tableYear + '</h4>';
+
+
+		time.innerHTML = '<h4>testTime.value.hour = ' + testTime.value.hour + '</h4>' +
+						'<h4>testTime.value.minute = ' + testTime.value.minute + '</h4>' +
+						'<h4>testTime.value.hour12 = ' + testTime.value.hour12 + '</h4>' +
+						'<h4>testTime.value.meridiem = ' + testTime.value.meridiem + '</h4>' +
+						'<h4>testTime.value.formatTime = ' + testTime.value.formatTime + '</h4>';
+	}
+	createValue();
+	tTime.EventHandler.addHandler(window, 'click', function(e){
+		createValue();
+	});
+	tTime.EventHandler.addHandler(window, 'keydown', function(e){
+		createValue();
+	});
 
 </script>
 </body>

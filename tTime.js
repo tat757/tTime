@@ -19,7 +19,7 @@ var tTime = {
 	dropTheadStyle : {
 		height: '16px',
 		width: '232px',
-		backgroundColor: '#00ffbf',
+		backgroundColor: 'white',
 		borderBottomWidth: '1px',
 		borderBottomStyle: 'solid',
 		borderBottomColor: '#85144b',
@@ -38,7 +38,7 @@ var tTime = {
 	},
 	setValue : function(value, type){
 		var tTime = this;
-		if(type === 'h'){
+		if(type === 'hour'){
 			tTime.value.time.hour12 = value;
 			if(tTime.value.time.meridiem == 'AM'){
 				if(value == 12){
@@ -55,10 +55,10 @@ var tTime = {
 				}
 			}
 		}
-		else if(type === 'm'){
+		else if(type === 'minute'){
 			tTime.value.time.minute = +value;
 		}
-		else if(type === 't'){
+		else if(type === 'time'){
 			if(value == 'AM'){
 				tTime.value.time.meridiem = 'AM';
 				tTime.value.time.hour = tTime.value.time.hour12;
@@ -76,20 +76,19 @@ var tTime = {
 		}
 		else if(type === 'date'){
 			var date = new Date(value);
+			var day;
 			tTime.value.date.month = date.getMonth() + 1;
 			tTime.value.date.day = date.getDate();
 			tTime.value.date.year = date.getFullYear();
-			tTime.value.date.formatDate = tTime.value.date.month + '\/' + tTime.value.date.day + '\/' + tTime.value.date.year;
+			tTime.value.date.day < 10 ? day = '0' + tTime.value.date.day : day = tTime.value.date.day;
+			tTime.value.date.formatDate = tTime.value.date.month + '\/' + day + '\/' + tTime.value.date.year;
 		}
 		tTime.value.time.minute < 10 ? 
 			tTime.value.time.formatTime = tTime.value.time.hour12 + ':0' + tTime.value.time.minute + tTime.value.time.meridiem 
 			: tTime.value.time.formatTime = tTime.value.time.hour12 + ':' + tTime.value.time.minute + tTime.value.time.meridiem;
 	},
-	setDate : function(id, value){
-		var date = new Date(value);
-		id.firstChild.value = date.getMonth() + 1;
-		date.getDate() < 10 ? id.firstChild.nextSibling.nextSibling.value = '0' + date.getDate() : id.firstChild.nextSibling.nextSibling.value = date.getDate();
-		id.lastChild.value = date.getFullYear();
+	setDate : function(id){
+		id.firstChild.value = tTime.value.date.formatDate;
 	},
 	setStyle : function(id, styles){
 		if(id.style){
@@ -127,7 +126,7 @@ var tTime = {
 				e = EventHandler.getEvent(e);
 				var target = EventHandler.getTarget(e);
 				var hour;
-				if(type === 't'){
+				if(type === 'time'){
 					if(e.keyCode === 38 || e.keyCode === 40){
 						if(target.value === 'PM'){
 							target.value = 'AM';
@@ -155,9 +154,9 @@ var tTime = {
 							target.parentNode.parentNode.value.hour += 12;
 						}
 					}
-					tTime.setValue(target.value, 't');
+					tTime.setValue(target.value, 'time');
 				}
-				else if(type === 'm'){
+				else if(type === 'minute'){
 					if(!isNaN(e.key) && e.keyCode !== 32){
 						if(+target.value > 10 || +target.value > 5){
 							target.value = '0' + e.key;
@@ -165,10 +164,10 @@ var tTime = {
 						else{
 							target.value = target.value.split('')[1] + e.key;
 						}
-						tTime.setValue(+target.value, 'm');
+						tTime.setValue(+target.value, 'minute');
 					}
 				}
-				else if(type === 'h'){
+				else if(type === 'hour'){
 					if(!isNaN(e.key) && e.keyCode !== 32){
 						if(e.key == 0){
 							target.value = '12';
@@ -179,7 +178,7 @@ var tTime = {
 						else{
 							target.value = e.key;
 						}
-						tTime.setValue(+target.value, 'h');
+						tTime.setValue(+target.value, 'hour');
 					}
 					
 				}
@@ -231,7 +230,6 @@ var tTime = {
 					e = EventHandler.getEvent(e);
 					var target = EventHandler.getTarget(e);
 					if(id.style.backgroundColor !== 'rgb(0, 128, 255)' && id.style.backgroundColor !== '#0080ff'){
-						console.log(tTime);
 						tTime.setStyle(id, {backgroundColor: '#00bfff'});
 					}
 				});
@@ -243,7 +241,6 @@ var tTime = {
 				EventHandler.addHandler(id, 'mouseout', function(e){
 					e = EventHandler.getEvent(e);
 					var target = EventHandler.getTarget(e);
-					console.log(id.style.backgroundColor);
 					if(id.style.backgroundColor !== 'rgb(0, 128, 255)' && id.style.backgroundColor !== '#0080ff'){
 						tTime.setStyle(id, {backgroundColor: 'white'});
 					}
@@ -257,7 +254,6 @@ var tTime = {
 					e = EventHandler.getEvent(e);
 					var target = EventHandler.getTarget(e);
 					if(target.className !== 'tTimeDateInput'){
-						console.log(target);
 						if(target.className == 'tTimeDateCell'){
 							var oldSelected = document.querySelectorAll('[data-selected]');
 							for(selected in oldSelected){
@@ -270,7 +266,7 @@ var tTime = {
 							target.dataset.selected = true;
 							tTime.setValue(target.dataset.date, 'date');
 							target.parentNode.parentNode.parentNode.style.display = 'none';
-							tTime.setDate(target.parentNode.parentNode.parentNode.previousSibling, target.dataset.date);
+							tTime.setDate(target.parentNode.parentNode.parentNode.previousSibling);
 
 						}
 						else if(target.className !== 'tTimeDropTitleLeftButton' && target.className !== 'tTimeDropTitleRightButton'){
@@ -293,7 +289,6 @@ var tTime = {
 						}
 						var title = target.parentNode;
 						var tbody = target.parentNode.parentNode.lastChild;
-						console.log(target.parentNode);
 						var tableTime = new Date();
 						tableTime.setMonth(tTime.value.date.tableMonth);
 						tableTime.setYear(tTime.value.date.tableYear);
@@ -313,7 +308,6 @@ var tTime = {
 						}
 						var title = target.parentNode;
 						var tbody = target.parentNode.parentNode.lastChild;
-						console.log(target.parentNode);
 						var tableTime = new Date();
 						tableTime.setMonth(tTime.value.date.tableMonth);
 						tableTime.setYear(tTime.value.date.tableYear);
@@ -376,9 +370,9 @@ var tTime = {
 		tTime.value.time.minute < 10 ? m.value = '0' + tTime.value.time.minute : m.value = tTime.value.time.minute;
 		t.value = tTime.value.time.meridiem;
 
-		tTime.EventHandler.keydown(t, 't');
-		tTime.EventHandler.keydown(m, 'm');
-		tTime.EventHandler.keydown(h, 'h');
+		tTime.EventHandler.keydown(t, 'time');
+		tTime.EventHandler.keydown(m, 'minute');
+		tTime.EventHandler.keydown(h, 'hour');
 
 		tTime.EventHandler.focus(h, 'time');
 		tTime.EventHandler.focus(m, 'time');
@@ -503,7 +497,8 @@ var tTime = {
 			width : '36px',
 			height : '32px',
 			float : 'left',
-			cursor : 'pointer'
+			cursor : 'pointer',
+			backgroundColor: 'white'
 		}
 		tTime.setStyle(leftButton, dropTitleButtonStyle);
 		tTime.setStyle(rightButton, dropTitleButtonStyle);
@@ -522,36 +517,26 @@ var tTime = {
 		var dropThead = document.createElement('div');
 		var dropTbody = document.createElement('div');
 		p.appendChild(d);
-		d.innerHTML = '<input type=\"text\"></input>/<input type=\"text\"></input>/<input type=\"text\"></input>';
+		d.innerHTML = '<input type=\"text\"></input>';
 		drop.className = 'tTimeDrop';
 		p.appendChild(drop);
 		
-		var month = d.firstChild;
-		var day = month.nextSibling.nextSibling;
-		var year = day.nextSibling.nextSibling;
-		month.className = day.className = year.className = 'tTimeDateInput';
+		var date = d.firstChild;
+		date.className = 'tTimeDateInput';
 		var currTime = new Date();
-		tTime.EventHandler.focus(month, 'date');
-		tTime.EventHandler.focus(day, 'date');
-		tTime.EventHandler.focus(year, 'date');
+		tTime.EventHandler.focus(date, 'date');
+		tTime.EventHandler.keydown(date, '');
 		tTime.EventHandler.click(window, 'window');
 		//set style
-		var mdStyle = {
+		var dateStyle = {
 			height : '16px',
-			width : '14px',
+			width : '70px',
 			padding : '0px',
 			border : 'none',
 			font : '12px',
-			textAlign : 'right',
-			cursor: 'pointer'
-		};
-		var yStyle = {
-			height : '16px',
-			width : '28px',
-			padding : '0px',
-			border : 'none',
-			font : '12px',
-			cursor: 'pointer'
+			textAlign : 'center',
+			cursor: 'pointer',
+			disabled : true
 		};
 		var dStyle = {
 			height: '16px',
@@ -562,7 +547,8 @@ var tTime = {
 			paddingRight: '7px',
 			backgroundColor: '#DDDDDD',
 			position: 'relative',
-			float : 'left'
+			float : 'left',
+			cursor: 'pointer'
 		};
 		var dropStype = {
 			fontFamily: 'Arial, Helvetica, sans-serif',
@@ -570,33 +556,29 @@ var tTime = {
 			height: '181px',
 			width: '232px',
 			position: 'absolute',
-			backgroundColor: 'White',
-			display: 'block',
+			backgroundColor: 'white',
+			display: 'none',
 			zIndex: '1'
 		};
 		var dropTitleStyle = {
 			height: '32px',
-			backgroundColor: 'red'
+			backgroundColor: 'white'
 		};
 		var dropTbodyStyle = {
 			float: 'left'
 		}
-		tTime.setStyle(month, mdStyle);
-		tTime.setStyle(day, mdStyle);
-		tTime.setStyle(year, yStyle);
+		tTime.setStyle(date, dateStyle);
 		tTime.setStyle(d, dStyle);
 		tTime.setStyle(drop, dropStype);
 		tTime.setStyle(dropTitle, dropTitleStyle);
 		tTime.setStyle(dropThead, tTime.dropTheadStyle);
 		tTime.setStyle(dropTbody, dropTbodyStyle);
 		//initialize value to user's current time
-		day.value = currTime.getDate();
-		month.value = currTime.getMonth() + 1;
-		year.value = currTime.getFullYear();
 		tTime.setValue(currTime, 'date');
-		tTime.value.date.tableMonth = month.value - 1;
-		tTime.value.date.tableYear = year.value;
+		tTime.value.date.tableMonth = tTime.value.date.month - 1;
+		tTime.value.date.tableYear = tTime.value.date.year;
 		p.value = tTime.value.date;
+		date.value = tTime.value.date.formatDate;
 
 		//set drop
 		drop.appendChild(dropTitle);

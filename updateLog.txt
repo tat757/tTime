@@ -1,3 +1,9 @@
+0.6.0
+-Added data showcase on demo page
+-Improved the usage of date pick feature
+-Improved the style
+
+
 0.5.0
 -Added Date pick feature
 -Improved object structure
