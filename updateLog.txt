@@ -1,3 +1,7 @@
+0.6.1
+-Improved demo page's style
+-Fixed typo on demo page
+
 0.6.0
 -Added data showcase on demo page
 -Improved the usage of date pick feature

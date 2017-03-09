@@ -29,7 +29,7 @@
 <div style="clear: both;">
 	<div id="testTime"></div><h6>(id:testTime)</h6>
 </div>
-<h6>Create the time picker by using: tTime.createDate('testTime');</h6>
+<h6>Create the time picker by using: tTime.createTime('testTime');</h6>
 <div id="timeValue"></div>
 <script type="text/javascript">
 
@@ -38,6 +38,9 @@
 	console.log(document.body.style);
 	document.body.style.backgroundColor = '#900C3F';
 	document.body.style.fontFamily = 'Arial, Helvetica, sans-serif';
+	document.body.style.minWidth = '600px';
+	document.body.style.width = '600px';
+	document.body.style.margin = '0 auto';
 	//check the value of the time picker
 	var createValue = function(){
 		var date = document.getElementById('dateValue');
