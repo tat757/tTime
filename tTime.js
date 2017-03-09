@@ -126,8 +126,10 @@ var tTime = {
 				e = EventHandler.getEvent(e);
 				var target = EventHandler.getTarget(e);
 				var hour;
+				var check = false;
+				var keyValue;
 				if(type === 'time'){
-					if(e.keyCode === 38 || e.keyCode === 40){
+					if(e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.keyCode === 38 || e.keyCode === 40){
 						if(target.value === 'PM'){
 							target.value = 'AM';
 							if(target.parentNode.parentNode.value.hour > 12){
@@ -142,13 +144,13 @@ var tTime = {
 						}
 						hour = target.parentNode.parentNode.value.hour;
 					}
-					else if(e.key === 'a' || e.key === 'A'){
+					else if(e.key === 'a' || e.key === 'A' || e.keyCode === 65){
 						target.value = 'AM';
 						if(target.parentNode.parentNode.value.hour > 12){
 							target.parentNode.parentNode.value.hour -= 12;
 						}
 					}
-					else if(e.key === 'p' || e.key === 'P'){
+					else if(e.key === 'p' || e.key === 'P' || e.keyCode === 80){
 						target.value = 'PM';
 						if(target.parentNode.parentNode.value.hour <= 12){
 							target.parentNode.parentNode.value.hour += 12;
@@ -157,26 +159,48 @@ var tTime = {
 					tTime.setValue(target.value, 'time');
 				}
 				else if(type === 'minute'){
-					if(!isNaN(e.key) && e.keyCode !== 32){
+					if(e.key){
+						if(!isNaN(e.key) && !(e.key === ' ' || e.keyCode === 32)){
+							check = true;
+						}
+					}
+					else{
+						if(e.keyCode >= 48 && e.keyCode <= 57){
+							check = true;
+						}
+					}
+					if(check){
+						e.key ? keyValue = e.key : keyValue = String.fromCharCode(e.keyCode);
 						if(+target.value > 10 || +target.value > 5){
-							target.value = '0' + e.key;
+							target.value = '0' + keyValue;
 						}
 						else{
-							target.value = target.value.split('')[1] + e.key;
+							target.value = target.value.split('')[1] + keyValue;
 						}
 						tTime.setValue(+target.value, 'minute');
 					}
 				}
 				else if(type === 'hour'){
-					if(!isNaN(e.key) && e.keyCode !== 32){
-						if(e.key == 0){
+					if(e.key){
+						if(!isNaN(e.key) && !(e.key === ' ' || e.keyCode === 32)){
+							check = true;
+						}
+					}
+					else{
+						if(e.keyCode >= 48 && e.keyCode <= 57){
+							check = true;
+						}
+					}
+					if(check){
+						e.key ? keyValue = e.key : keyValue = String.fromCharCode(e.keyCode);
+						if(keyValue == 0){
 							target.value = '12';
 						}
-						else if(+target.value == 1 && +e.key < 3){
-							target.value = '1' + e.key;
+						else if(+target.value == 1 && +keyValue < 3){
+							target.value = '1' + keyValue;
 						}
 						else{
-							target.value = e.key;
+							target.value = keyValue;
 						}
 						tTime.setValue(+target.value, 'hour');
 					}

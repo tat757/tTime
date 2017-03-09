@@ -1,3 +1,6 @@
+0.6.2
+-Fixed an issue which cause the time picker not working on mobile
+
 0.6.1
 -Improved demo page's style
 -Fixed typo on demo page
