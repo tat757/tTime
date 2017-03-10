@@ -31,7 +31,8 @@ var tTime = {
 	},
 	dropTheadCellStyle : {
 		fontSize: '12px', 
-		width: '33px', 
+		width: '33px',
+		padding: '0',
 		textAlign: 'center', 
 		cursor: 'default',
 		display: 'inline-block'
